@@ -1,0 +1,28 @@
+﻿<Window x:Class="MicrowaveModule.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MicrowaveModule"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="350" Width="800" MinWidth="620" MinHeight="320">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="19*"/>
+            <ColumnDefinition Width="61*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid >
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <Button x:Name="buttonConnectMenu" Content="Connect" Click="buttonConnectMenu_Click" ></Button>
+            <Button x:Name="buttonControlMenu" Content="Control" Grid.Row="1" Click="buttonControlMenu_Click"></Button>
+            <Button x:Name="buttonMemoryMenu"  Content="Memory" Grid.Row="2" Click="buttonMemoryMenu_Click"/>
+        </Grid>
+        
+        <ContentControl x:Name="ControlMenuContent" Grid.Column="1"></ContentControl>
+    </Grid>
+</Window>
