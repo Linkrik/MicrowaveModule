@@ -16,7 +16,7 @@ namespace MicrowaveModule
     /// <summary>
     /// Логика взаимодействия для UserControlControl.xaml
     /// </summary>
-    public partial class UserControlControl : UserControl
+    public partial class UserControlControl  //: UserControl
     {
         public UserControlControl()
         {
