@@ -22,7 +22,7 @@ namespace MicrowaveModule
     public partial class UserControlConnect //: UserControl
     {
          
-        SerialPort ComPort;
+        public static SerialPort ComPort;
         public UserControlConnect()
         {
 
