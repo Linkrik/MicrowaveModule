@@ -36,10 +36,20 @@
                         <ColumnDefinition></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
                     </Grid.ColumnDefinitions>
 
                     <StackPanel Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <CheckBox  >
+                        <CheckBox x:Name="checkBoxAtt1bit5" Checked="checkBoxAtt1bit5_Checked" Unchecked="checkBoxAtt1bit5_Unchecked" >
+                            <CheckBox.LayoutTransform>
+                                <ScaleTransform ScaleX="2" ScaleY="2" />
+                            </CheckBox.LayoutTransform>
+                        </CheckBox>
+                        <Label Content="5"  HorizontalAlignment="Center" VerticalAlignment="Center"></Label>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <CheckBox x:Name="checkBoxAtt1bit4" Checked="checkBoxAtt1bit4_Checked" Unchecked="checkBoxAtt1bit4_Unchecked" >
                             <CheckBox.LayoutTransform>
                                 <ScaleTransform ScaleX="2" ScaleY="2" />
                             </CheckBox.LayoutTransform>
@@ -47,8 +57,8 @@
                         <Label Content="4"  HorizontalAlignment="Center" VerticalAlignment="Center"></Label>
                     </StackPanel>
 
-                    <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <CheckBox  >
+                    <StackPanel Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <CheckBox x:Name="checkBoxAtt1bit3" Checked="checkBoxAtt1bit3_Checked" Unchecked="checkBoxAtt1bit3_Unchecked" >
                             <CheckBox.LayoutTransform>
                                 <ScaleTransform ScaleX="2" ScaleY="2" />
                             </CheckBox.LayoutTransform>
@@ -56,8 +66,8 @@
                         <Label Content="3"  HorizontalAlignment="Center" VerticalAlignment="Center"></Label>
                     </StackPanel>
 
-                    <StackPanel Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <CheckBox  >
+                    <StackPanel Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <CheckBox x:Name="checkBoxAtt1bit2" Checked="checkBoxAtt1bit2_Checked" Unchecked="checkBoxAtt1bit2_Unchecked">
                             <CheckBox.LayoutTransform>
                                 <ScaleTransform ScaleX="2" ScaleY="2" />
                             </CheckBox.LayoutTransform>
@@ -65,8 +75,8 @@
                         <Label Content="2"  HorizontalAlignment="Center" VerticalAlignment="Center"></Label>
                     </StackPanel>
 
-                    <StackPanel Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <CheckBox  >
+                    <StackPanel Grid.Column="4" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <CheckBox  x:Name="checkBoxAtt1bit1" Checked="checkBoxAtt1bit1_Checked" Unchecked="checkBoxAtt1bit1_Unchecked">
                             <CheckBox.LayoutTransform>
                                 <ScaleTransform ScaleX="2" ScaleY="2" />
                             </CheckBox.LayoutTransform>
@@ -74,8 +84,8 @@
                         <Label Content="1"  HorizontalAlignment="Center" VerticalAlignment="Center"></Label>
                     </StackPanel>
 
-                    <StackPanel Grid.Column="4" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <CheckBox  >
+                    <StackPanel Grid.Column="5" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <CheckBox x:Name="checkBoxAtt1bit0" Checked="checkBoxAtt1bit0_Checked" Unchecked="checkBoxAtt1bit0_Unchecked"   >
                             <CheckBox.LayoutTransform>
                                 <ScaleTransform ScaleX="2" ScaleY="2" />
                             </CheckBox.LayoutTransform>
@@ -84,11 +94,11 @@
                     </StackPanel>
 
                 </Grid>
-                <TextBox Text="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" MaxLength="2" FontSize="20" Grid.Column="1"  HorizontalAlignment="Center" VerticalAlignment="Center" Width="40" Height="40" Margin="0,0,20,10">
+                <TextBox x:Name="textBoxAttenuatorUpDown" Text="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" MaxLength="2" FontSize="20" Grid.Column="1"  HorizontalAlignment="Center" VerticalAlignment="Center" Width="40" Height="40" Margin="0,0,20,10">
 
                 </TextBox>
-                <Button Content="▲" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Height="20" Width="20" Margin="40,0,0,30"></Button>
-                <Button Content="▼" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Height="20" Width="20" Margin="40,10,0,0"/>
+                <Button  x:Name="buttonUpTextBoxAtt" Content="▲" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Height="20" Width="20" Margin="40,0,0,30" Click="buttonUpTextBoxAtt_Click"/>
+                <Button  x:Name="buttonDownTextBoxAtt" Content="▼" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Height="20" Width="20" Margin="40,10,0,0" Click="buttonDownTextBoxAtt_Click"/>
             </Grid>
         </GroupBox>
 
