@@ -142,7 +142,6 @@ namespace MicrowaveModule
             //listBoxConnect.SelectedIndex = listBoxConnect.Items.Count - 1;
         }
 
-
         private void comboBoxPorts_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             //проверка открыт ли порт

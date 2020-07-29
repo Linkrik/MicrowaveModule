@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:MicrowaveModule"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid Background="#00BFFF">
+    <Grid Background="#FFBFDFFF">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="9*"></ColumnDefinition>
             <ColumnDefinition Width="97*"></ColumnDefinition>
@@ -155,12 +155,12 @@
                     </TextBlock>
                 </Button>
                 <Button x:Name="buttonDownTextBoxCodeDac" Content="▼"  FontSize="10" VerticalAlignment="Center" HorizontalAlignment="Right" Height="15" Width="30" Margin="0,35,30,0" Click="buttonDownTextBoxCodeDac_Click"></Button>
-                <ComboBox x:Name="comboBoxDacStep" Grid.Column="1 "   VerticalAlignment="Center" Margin="20,20,20,0" Height="30" SelectionChanged="comboBoxDacStep_SelectionChanged" ></ComboBox>
+                <ComboBox x:Name="comboBoxDacStep"  Grid.Column="1 "   VerticalAlignment="Center" Margin="20,20,20,0" Height="30" SelectionChanged="comboBoxDacStep_SelectionChanged"  ></ComboBox>
                 <Label  Content="Code DAC 12-bit" HorizontalAlignment="Center" VerticalAlignment="Center" Width="136" Height="22" FontSize="10" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" Margin="0,0,0,30"></Label>
                 <Label  Grid.Column="1" Content="DAC step" HorizontalAlignment="Center" VerticalAlignment="Center" Width="136" Height="22" FontSize="10" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" Margin="0,0,0,30"></Label>
             </Grid>
         </GroupBox>
 
-        <Border BorderBrush="Black" BorderThickness="3" Background="Aqua" Grid.Column="2" Grid.Row="2" CornerRadius="15" Margin="5,15,5,5"></Border>
+        
     </Grid>
 </UserControl>

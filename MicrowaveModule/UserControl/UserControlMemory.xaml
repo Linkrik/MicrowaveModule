@@ -6,8 +6,9 @@
              xmlns:local="clr-namespace:MicrowaveModule"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid Background="#00BFFF">
+    <Grid Background="#FFBFDFFF">
         <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
             <RowDefinition></RowDefinition>
             <RowDefinition></RowDefinition>
             <RowDefinition></RowDefinition>
@@ -18,14 +19,55 @@
             <ColumnDefinition Width="3*"></ColumnDefinition>
             <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Button Content="Посылка запроса температуры" FontSize="20" Grid.Row="0" Margin="10,5,10,5"></Button>
-        <Button Content="Посылка чтения одного коэффициента" FontSize="17" Grid.Row="1" Margin="10,5,10,5"></Button>
-        <Button  FontSize="17" Grid.Row="2" Margin="10,5,10,5">
+        <Button x:Name="buttonRequestTemperature" Content="Посылка запроса температуры" FontSize="20" Grid.Row="0" Margin="10,5,10,5" Click="requestTemperature_Click" Background="#FFDDDDDD"></Button>
+        <Button x:Name="buttonRequestAdcCode" Content="Посылка запроса кода АЦП" FontSize="17" Grid.Row="1" Margin="10,5,10,5" Click="buttonRequestAdcCode_Click" ></Button>
+        <Button x:Name="buttonRequestReadingOneCoefficient" Content="Посылка чтения одного коэффициента" FontSize="17" Grid.Row="2" Margin="10,5,10,5"></Button>
+        <Button x:Name="buttonRequestReadingOddsTable" FontSize="17" Grid.Row="3" Margin="10,5,10,5" Click="buttonRequestReadingOddsTable_Click">
             <TextBlock>Посылка чтения полной<LineBreak/>таблицы коэффициентов</TextBlock>
         </Button>
-        <Button Content="Посылка записи одного коэффициента" Margin="10,5,10,5" FontSize="17" Grid.Row="3" ></Button>
-        <Button FontSize="17" Grid.Row="4" Margin="10,5,10,5">
+        <Button x:Name="buttonRecordOfOneCoefficient" Content="Посылка записи одного коэффициента" Margin="10,5,10,5" FontSize="17" Grid.Row="4" Click="buttonRecordOfOneCoefficient_Click" ></Button>
+        <Button x:Name="buttonOddsTableEntry" FontSize="17" Grid.Row="5" Margin="10,5,10,5" Click="buttonOddsTableEntry_Click">
             <TextBlock>Посылка записи полной<LineBreak/>таблицы коэффициентов</TextBlock>
         </Button>
+
+        <Border x:Name="borderTemperature" Grid.Column="1" Background="Azure" CornerRadius="15" Margin="10,5,10,5">
+            <TextBlock x:Name="textBlockTemperature" Text="__" TextAlignment="Center" VerticalAlignment="Center"></TextBlock>
+        </Border>
+        
+        <Border x:Name="borderADC" Grid.Column="1" Grid.Row="1" Background="Azure" CornerRadius="15" Margin="10,5,10,5">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <Label Height="25" Content="high" HorizontalAlignment="Center"></Label>
+                    <TextBlock x:Name="textBlockAdcHigh" Text="_" Height="20" TextAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1">
+                    <Label Height="25" Content="low" HorizontalAlignment="Center"></Label>
+                    <TextBlock x:Name="textBlockAdcLow" Text="_"  Height="20" TextAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                </StackPanel>
+            </Grid>
+        </Border>
+        <Border x:Name="borderRequestReadingOneCoefficient" Grid.Column="1" Grid.Row="2" Background="Azure" CornerRadius="15" Margin="10,5,10,5">
+            <Grid>
+                <Label Content="адрес" Margin="0,0,100,45" Height="25" VerticalAlignment="Center" HorizontalAlignment="Center"></Label>
+                <TextBox x:Name="textBoxRequestReadingOneCoefficient" Text="0" VerticalAlignment="Center" Margin="20,20,70,5" Height="30" MaxLength="5" FontSize="22" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" TextChanged="textBoxRequestReadingOneCoefficient_TextChanged" />
+                <Button x:Name= "buttonUpRequestReadingOneCoefficient" Content="▲" FontSize="10" VerticalAlignment="Center" HorizontalAlignment="Right" Height="15" Width="30" Margin="0,15,40,15" Click="buttonUpRequestReadingOneCoefficient_Click"> </Button>
+                <Button x:Name= "buttonDownRequestReadingOneCoefficient" Content="▼"  FontSize="10" VerticalAlignment="Center" HorizontalAlignment="Right" Height="15" Width="30" Margin="0,30,40,0" Click="buttonDownRequestReadingOneCoefficient_Click" ></Button>
+            </Grid>
+        </Border>
+
+        <Border x:Name="borderRequestWriteOneCoefficient" Grid.Column="1" Grid.Row="4" Background="Azure" CornerRadius="15" Margin="10,5,10,5">
+            <Grid>
+                <Label Content="коэффициент" Margin="10,0,70,45" Height="25" VerticalAlignment="Center" HorizontalAlignment="Center"></Label>
+                <TextBox x:Name="textBoxRequestWriteOneCoefficient" Text="0" VerticalAlignment="Center" Margin="20,20,70,5" Height="30" MaxLength="5" FontSize="22" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" TextChanged="textBoxRequestWriteOneCoefficient_TextChanged"  />
+                <Button x:Name= "buttonUpRequestWriteOneCoefficient" Content="▲" FontSize="10" VerticalAlignment="Center" HorizontalAlignment="Right" Height="15" Width="30" Margin="0,15,40,15" Click="buttonUpRequestWriteOneCoefficient_Click" ></Button>
+                <Button x:Name= "buttonDownRequestWriteOneCoefficient" Content="▼"  FontSize="10" VerticalAlignment="Center" HorizontalAlignment="Right" Height="15" Width="30" Margin="0,30,40,0" Click="buttonDownRequestWriteOneCoefficient_Click"  ></Button>
+            </Grid>
+        </Border>
     </Grid>
 </UserControl>

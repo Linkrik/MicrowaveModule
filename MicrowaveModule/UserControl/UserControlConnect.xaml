@@ -8,7 +8,7 @@
              d:DesignHeight="350" d:DesignWidth="650">
 
 
-    <Grid Background="#00BFFF">
+    <Grid Background="#FFBFDFFF">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="114*"></ColumnDefinition>
             <ColumnDefinition Width="126*"></ColumnDefinition>

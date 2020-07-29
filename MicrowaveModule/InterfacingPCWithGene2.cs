@@ -335,7 +335,7 @@ namespace MicrowaveModule.UserControl
                 if (i>0)
                 {
 
-                    bytesToReadADC[i] = bytesToWrite[i];
+                    bytesToReadADC[i-1] = bytesToWrite[i];
                 }
 
             }

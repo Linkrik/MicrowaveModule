@@ -21,14 +21,13 @@ namespace MicrowaveModule
     /// </summary>
     public partial class MainWindow : Window
     {
-        SerialPort ComPort;
         public MainWindow()
         {
             InitializeComponent();
             ControlMenuContent.Content = UCConnect;
-            buttonConnectMenu.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0x00, 0x74, 0xFD));
-            buttonControlMenu.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0x74, 0xB2, 0xFB));
-            buttonMemoryMenu.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0x74, 0xB2, 0xFB));
+            buttonConnectMenu.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0x00, 0x74, 0xFD)); 
+            buttonControlMenu.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0xDD, 0xDD, 0xDD));
+            buttonMemoryMenu.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0xDD, 0xDD, 0xDD));
         }
 
         UserControlConnect UCConnect = new UserControlConnect();
@@ -39,23 +38,23 @@ namespace MicrowaveModule
         {
             ControlMenuContent.Content= UCConnect;
             buttonConnectMenu.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0x00, 0x74, 0xFD));
-            buttonControlMenu.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0x74, 0xB2, 0xFB));
-            buttonMemoryMenu.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0x74, 0xB2, 0xFB));
+            buttonControlMenu.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0xDD, 0xDD, 0xDD));
+            buttonMemoryMenu.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0xDD, 0xDD, 0xDD));
         }
 
         private void buttonControlMenu_Click(object sender, RoutedEventArgs e)
         {
             ControlMenuContent.Content = UCControl;
-            buttonConnectMenu.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0x74, 0xB2, 0xFB));
+            buttonConnectMenu.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0xDD, 0xDD, 0xDD));
             buttonControlMenu.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0x00, 0x74, 0xFD));
-            buttonMemoryMenu.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0x74, 0xB2, 0xFB));
+            buttonMemoryMenu.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0xDD, 0xDD, 0xDD));
         }
 
         private void buttonMemoryMenu_Click(object sender, RoutedEventArgs e)
         {
             ControlMenuContent.Content = UCMemory;
-            buttonConnectMenu.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0x74, 0xB2, 0xFB));
-            buttonControlMenu.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0x74, 0xB2, 0xFB));
+            buttonConnectMenu.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0xDD, 0xDD, 0xDD));
+            buttonControlMenu.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0xDD, 0xDD, 0xDD));
             buttonMemoryMenu.Background = new SolidColorBrush(Color.FromArgb(0xFF, 0x00, 0x74, 0xFD));
         }
     }

@@ -36,21 +36,40 @@ namespace MicrowaveModule
         private byte codeDac = 0;   //значение затворного напряжения cod DAC
         private byte dacStep = 0;   //значение затворного напряжения DAC Step
         private byte valueAtt = 0;  //значение аттенюатора
-        private int valuePow = 0;  //значение питания
+        private byte valuePow = 0;  //значение питания
         private bool flagEvent = true;
 
 
         /// <summary>
-        /// управление затворным напряжением ---------------------------------------------------------------------------!!!
+        /// управление затворным напряжением
         /// </summary>
         private void NumericUpDownCodeDac_Value()
         {
-            textBoxCodeDac12Bit.Text = Convert.ToString(codeDac);
-            if (comboBoxDacStep!=null)
+            int number;
+            if (int.TryParse(textBoxCodeDac12Bit.Text, out number))
             {
-                dacStep = Convert.ToByte(comboBoxDacStep.Text);
+                if (number >=0 && number <= 255)
+                {
+                    textBoxCodeDac12Bit.Text = Convert.ToString(number);
+                    codeDac = Convert.ToByte(number);
+                }
+                else if (number < 0)
+                {
+                    number = 0;
+                    textBoxCodeDac12Bit.Text = Convert.ToString(number);
+                    codeDac = Convert.ToByte(number);
+                }
+                else
+                {
+                    number = 255;
+                    textBoxCodeDac12Bit.Text = Convert.ToString(number);
+                    codeDac = Convert.ToByte(number);
+                }
             }
-
+            else
+            {
+                textBoxCodeDac12Bit.Text = Convert.ToString(codeDac);
+            }
 
             if (UserControlConnect.ComPort.IsOpen)
             {
@@ -63,8 +82,13 @@ namespace MicrowaveModule
         /// </summary>
         private void GenerationNumericUpDownPower_Value()
         {
-            valuePow = Convert.ToInt32(checkBoxGeneralPowerSupple.IsChecked) |
-                       Convert.ToInt32(checkBoxStdnPower.IsChecked) << 1;
+            valuePow = Convert.ToByte(Convert.ToInt32(checkBoxGeneralPowerSupple.IsChecked) |
+                       Convert.ToInt32(checkBoxStdnPower.IsChecked) << 1);
+            
+            if (UserControlConnect.ComPort.IsOpen)
+            {
+                InterfacingPCWithGene2.sendControlPower(UserControlConnect.ComPort, valuePow);
+            }
 
         }
 
@@ -205,6 +229,7 @@ namespace MicrowaveModule
 
         #endregion
 
+        #region Event Up/Down textBox Attenuation
         private void buttonUpTextBoxAtt_Click(object sender, RoutedEventArgs e)
         {
 
@@ -231,7 +256,7 @@ namespace MicrowaveModule
         {
             if (textBoxAttenuatorUpDown.Text!="")
             {
-                int number = 0;
+                int number;
                 if (Int32.TryParse(textBoxAttenuatorUpDown.Text, out number))
                 {
                     if (number >= 0 && number <= 63)
@@ -256,7 +281,7 @@ namespace MicrowaveModule
                 }
             }
         }
-
+        #endregion
 
         #region Event checkBox Power
         private void checkBoxStdnPower_Checked(object sender, RoutedEventArgs e)
@@ -281,13 +306,15 @@ namespace MicrowaveModule
 
         #endregion
 
+        #region Event Up/Down textBox comboBox управление затворным напряжением
         private void buttonUpTextBoxCodeDac_Click(object sender, RoutedEventArgs e)
         {
             if (codeDac != 255)
             {
-                codeDac++;
+                 codeDac++;
             }
-            NumericUpDownCodeDac_Value();
+            textBoxCodeDac12Bit.Text = Convert.ToString(codeDac);
+
         }
 
         private void buttonDownTextBoxCodeDac_Click(object sender, RoutedEventArgs e)
@@ -296,42 +323,22 @@ namespace MicrowaveModule
             {
                 codeDac--;
             }
-            NumericUpDownCodeDac_Value();
+            textBoxCodeDac12Bit.Text = Convert.ToString(codeDac);
         }
 
         private void textBoxCodeDac12Bit_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (textBoxCodeDac12Bit.Text != "")
             {
-                byte number = 0;
-                if (byte.TryParse(textBoxCodeDac12Bit.Text, out number))
-                {
-                    if (number >= 0 && number <= 255)
-                    {
-                        codeDac = number;
-                        NumericUpDownCodeDac_Value();
-                    }
-                    else if (number < 0)
-                    {
-                        codeDac = 0;
-                        NumericUpDownCodeDac_Value();
-                    }
-                    else
-                    {
-                        codeDac = 255;
-                        NumericUpDownCodeDac_Value();
-                    }
-                }
-                else
-                {
-                    textBoxAttenuatorUpDown.Text = Convert.ToString(codeDac);
-                }
+                    NumericUpDownCodeDac_Value();
             }
         }
 
         private void comboBoxDacStep_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            dacStep = Convert.ToByte(comboBoxDacStep.SelectedItem);
             NumericUpDownCodeDac_Value();
         }
+        #endregion
     }
 }
