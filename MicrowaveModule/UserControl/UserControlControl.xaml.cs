@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -11,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace MicrowaveModule
 {
@@ -22,23 +24,39 @@ namespace MicrowaveModule
         public UserControlControl()
         {
             InitializeComponent();
+            buttonStopAdc.IsEnabled = false;
 
-            int[] DacStep = { 0, 16, 32, 64, 128, 240 };
+            timer.Tick += new EventHandler(timer_Tick);     //добавляем событие таймера при запуске
+            timer.Interval = new TimeSpan(0, 0, 0, 0, 200); //событие будет срабатывать через каждые 200 мили сек. 
+
+            int[] DacStep = { 1, 16, 32, 64, 128, 256};
             comboBoxDacStep.Items.Clear();
             foreach (var item in DacStep)
             {
                 comboBoxDacStep.Items.Add(item);
             }
-            comboBoxDacStep.Text = "0";
+            comboBoxDacStep.Text = "16";
+            textBoxCodeDac12Bit.Text = "4095";
         }
+        DispatcherTimer timer = new DispatcherTimer(); //создаем таймер
 
-
-        private byte codeDac = 0;   //значение затворного напряжения cod DAC
-        private byte dacStep = 0;   //значение затворного напряжения DAC Step
+        private int codeDac = 0;   //значение затворного напряжения cod DAC
+        private int dacStep = 0;   //значение затворного напряжения DAC Step
         private byte valueAtt = 0;  //значение аттенюатора
         private byte valuePow = 0;  //значение питания
         private bool flagEvent = true;
 
+        /// <summary>
+        /// событие при запуске таймера
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void timer_Tick(object sender, EventArgs e)
+        {
+            byte[] byteAdc= InterfacingPCWithGene2.requestAdcCode(UserControlConnect.ComPort);
+            int intAdc = byteAdc[0] * 256 + byteAdc[1];
+            textBlockAdc.Text = Convert.ToString(intAdc);
+        }
 
         /// <summary>
         /// управление затворным напряжением
@@ -48,22 +66,22 @@ namespace MicrowaveModule
             int number;
             if (int.TryParse(textBoxCodeDac12Bit.Text, out number))
             {
-                if (number >=0 && number <= 255)
+                if (number >=0 && number <= 4095)
                 {
                     textBoxCodeDac12Bit.Text = Convert.ToString(number);
-                    codeDac = Convert.ToByte(number);
+                    codeDac = Convert.ToInt32(number);
                 }
                 else if (number < 0)
                 {
                     number = 0;
                     textBoxCodeDac12Bit.Text = Convert.ToString(number);
-                    codeDac = Convert.ToByte(number);
+                    codeDac = Convert.ToInt32(number);
                 }
                 else
                 {
-                    number = 255;
+                    number = 4095;
                     textBoxCodeDac12Bit.Text = Convert.ToString(number);
-                    codeDac = Convert.ToByte(number);
+                    codeDac = Convert.ToInt32(number);
                 }
             }
             else
@@ -73,7 +91,7 @@ namespace MicrowaveModule
 
             if (UserControlConnect.ComPort.IsOpen)
             {
-                InterfacingPCWithGene2.sendControlGateVoltage(UserControlConnect.ComPort, codeDac, dacStep);
+                InterfacingPCWithGene2.sendControlGateVoltage(UserControlConnect.ComPort, codeDac);
             }
         }
 
@@ -309,21 +327,33 @@ namespace MicrowaveModule
         #region Event Up/Down textBox comboBox управление затворным напряжением
         private void buttonUpTextBoxCodeDac_Click(object sender, RoutedEventArgs e)
         {
-            if (codeDac != 255)
+            codeDac+= dacStep;
+            if (codeDac> 4095)
             {
-                 codeDac++;
+                codeDac = 4095;
             }
             textBoxCodeDac12Bit.Text = Convert.ToString(codeDac);
+
+            if (UserControlConnect.ComPort.IsOpen)
+            {
+                InterfacingPCWithGene2.sendControlGateVoltage(UserControlConnect.ComPort, codeDac);
+            }
 
         }
 
         private void buttonDownTextBoxCodeDac_Click(object sender, RoutedEventArgs e)
         {
-            if (codeDac != 0)
+            codeDac -= dacStep;
+            if (codeDac < 0)
             {
-                codeDac--;
+                codeDac = 0;
             }
             textBoxCodeDac12Bit.Text = Convert.ToString(codeDac);
+
+            if (UserControlConnect.ComPort.IsOpen)
+            {
+                InterfacingPCWithGene2.sendControlGateVoltage(UserControlConnect.ComPort, codeDac);
+            }
         }
 
         private void textBoxCodeDac12Bit_TextChanged(object sender, TextChangedEventArgs e)
@@ -336,9 +366,29 @@ namespace MicrowaveModule
 
         private void comboBoxDacStep_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            dacStep = Convert.ToByte(comboBoxDacStep.SelectedItem);
-            NumericUpDownCodeDac_Value();
+            dacStep = Convert.ToInt32(comboBoxDacStep.SelectedItem);
         }
         #endregion
+
+        private void buttonStartAdc_Click(object sender, RoutedEventArgs e)
+        {
+            if (UserControlConnect.ComPort.IsOpen)
+            {
+                timer.Start();
+                buttonStopAdc.IsEnabled = true;
+                buttonStartAdc.IsEnabled = false;
+            }
+            else
+            {
+                MessageBox.Show("устройство не подключено");
+            }
+        }
+
+        private void buttonStopAdc_Click(object sender, RoutedEventArgs e)
+        {
+            timer.Stop();
+            buttonStopAdc.IsEnabled = false;
+            buttonStartAdc.IsEnabled = true;
+        }
     }
 }

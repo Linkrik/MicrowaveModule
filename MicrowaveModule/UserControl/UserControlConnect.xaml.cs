@@ -1,6 +1,7 @@
 ﻿using MicrowaveModule.UserControl;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Ports;
 using System.Text;
 using System.Windows;
@@ -27,9 +28,8 @@ namespace MicrowaveModule
         {
 
             InitializeComponent();
-            
 
-            ComPort = new System.IO.Ports.SerialPort("COM0", 460800, Parity.None, 8, StopBits.One);
+            ComPort = new System.IO.Ports.SerialPort("COM0", 115200, Parity.None, 8, StopBits.One);
             ComPort.ReadTimeout = 3000;
             ComPort.WriteTimeout = 3000;
 
@@ -59,6 +59,8 @@ namespace MicrowaveModule
 
         }
 
+
+
         private void buttonPortSurvey_Click(object sender, RoutedEventArgs e)
         {
             string[] ports = SerialPort.GetPortNames();
@@ -76,6 +78,7 @@ namespace MicrowaveModule
             }
             listBoxConnect.Items.Add("");
             //listBoxConnect.SelectedIndex = listBoxConnect.Items.Count - 1;
+
         }
 
         private void buttonOpenPort_Click(object sender, RoutedEventArgs e)
@@ -90,6 +93,8 @@ namespace MicrowaveModule
                     listBoxConnect.Items.Add("");
                     //listBoxConnect.SelectedIndex = listBoxConnect.Items.Count - 1;
                     buttonСonnectionСheck.IsEnabled = true;
+
+
                 }
                 catch (Exception ex)
                 {
@@ -149,7 +154,10 @@ namespace MicrowaveModule
             {
                 ComPort.Close(); // если открыт, то закрываем (нужно сделать при открытом порте запрет менять)
             }
-            ComPort.PortName = Convert.ToString(comboBoxPorts.SelectedItem); //присваеваем новое имя COMPORT
+            if (comboBoxPorts.SelectedItem != null)
+            {
+                ComPort.PortName = Convert.ToString(comboBoxPorts.SelectedItem); //присваеваем новое имя COMPORT
+            }
 
             if (Convert.ToString(comboBoxPorts.SelectedItem) != null && Convert.ToString(comboBoxPorts.SelectedItem) != "")
             {

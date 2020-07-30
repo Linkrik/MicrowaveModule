@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Ports;
 using System.Text;
 using System.Windows;
@@ -85,7 +86,7 @@ namespace MicrowaveModule.UserControl
                 if ((0 < i) & (i < 6))
                 {
                     //name += System.Text.Encoding.ASCII.GetString(bytesToRead, i, 1);
-                    name += System.Text.Encoding.GetEncoding(1251).GetString(bytesToRead, i, 1);
+                    name += System.Text.Encoding.ASCII.GetString(bytesToRead, i, 1);
                 }
 
                 if ((5 < i) & (i < 15))
@@ -156,14 +157,14 @@ namespace MicrowaveModule.UserControl
         /// </summary>
         /// <param name="ComPort"> device </param>
         /// <param name="command"> attenuator control command </param>
-        public static void sendControlGateVoltage(SerialPort ComPort, byte command1, byte command2)
+        public static void sendControlGateVoltage(SerialPort ComPort, int command)
         {
             int N = 3;
             byte[] bytesToWrite = new byte[N];
             byte[] bytesToRead = new byte[N];
             bytesToWrite[0] = 0x47; // "C" (код команды) 
-            bytesToWrite[1] = command1; // старший байт адреса 12-ти битного кода ЦАП (0, 1, 2… 255)
-            bytesToWrite[2] = command2; // младший байт адреса 12-ти битного кода ЦАП (0, 16, 32… 240)
+            bytesToWrite[1] = (byte)(command/16);      // старший байт адреса 12-ти битного кода ЦАП (0, 1, 2… 255)
+            bytesToWrite[2] = (byte)((command%16)<<4); // младший байт адреса 12-ти битного кода ЦАП (0, 16, 32… 240)
 
 
 

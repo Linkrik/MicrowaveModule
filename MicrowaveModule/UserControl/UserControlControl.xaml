@@ -19,10 +19,43 @@
             <RowDefinition Height="49*"></RowDefinition>
             <RowDefinition Height="21*"/>
         </Grid.RowDefinitions>
+        <Border Grid.Column="2" Grid.Row="2" Background="Azure" CornerRadius="5" Margin="5,15,5,5">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="13*"></ColumnDefinition>
+                    <ColumnDefinition Width="30*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <Button x:Name="buttonStartAdc" Margin="5,5,0,0" Background="#FF35D82D" Click="buttonStartAdc_Click" >
+                    <Viewbox>
+                        <TextBlock>
+                            >
+                        </TextBlock>
+                    </Viewbox>
+                </Button>
+                <Button x:Name="buttonStopAdc" Grid.Row="1" Margin="5,0,0,5" Background="#FFF13434" Click="buttonStopAdc_Click">
+                    <Viewbox>
+                        <TextBlock Margin="0,0,0,5">
+                            ||
+                        </TextBlock>
+                    </Viewbox>
+                </Button>
+                <Label  Grid.Column="1" Grid.RowSpan="2"  HorizontalContentAlignment="Center">
+                    <Viewbox Margin="10">
+                        <TextBlock x:Name="textBlockAdc">
+                            ____
+                        </TextBlock>
+                    </Viewbox>
+                </Label>
+            </Grid>
+        </Border>
 
         <GroupBox Grid.Column="1"  Padding="5"  Background="White" Margin="0,2,0,5" Grid.Row="1">
             <GroupBox.Header>
-                <TextBlock Text="attenuator" VerticalAlignment="Bottom"  FontSize="17"/>
+                <TextBlock Text="attenuator" VerticalAlignment="Bottom" FontSize="17"/>
             </GroupBox.Header>
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -129,7 +162,7 @@
                     </CheckBox>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Height="75" >
-                    
+
                 </StackPanel>
             </StackPanel>
 
@@ -161,6 +194,6 @@
             </Grid>
         </GroupBox>
 
-        
+
     </Grid>
 </UserControl>
