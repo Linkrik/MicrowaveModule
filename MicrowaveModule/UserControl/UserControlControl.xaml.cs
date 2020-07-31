@@ -126,7 +126,7 @@ namespace MicrowaveModule
 
 
             //------------------------------------------------------//
-            if (UserControlConnect.ComPort.IsOpen)
+            if (true)//UserControlConnect.ComPort.IsOpen
             {
                 InterfacingPCWithGene2.sendControlAttDAC(UserControlConnect.ComPort, valueAtt);
             }

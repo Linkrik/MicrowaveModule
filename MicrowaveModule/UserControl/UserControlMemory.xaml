@@ -33,7 +33,7 @@
                 </TextBlock>
             </Viewbox>
         </Button>
-        <Button x:Name="buttonRequestReadingOneCoefficient" FontSize="10" Grid.Row="2" Margin="10,5,10,5">
+        <Button x:Name="buttonRequestReadingOneCoefficient" FontSize="10" Grid.Row="2" Margin="10,5,10,5" Click="buttonRequestReadingOneCoefficient_Click">
             <Viewbox Margin="15,0,15,0">
                 <TextBlock>
                     Посылка чтения одного коэффициента

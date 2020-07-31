@@ -225,5 +225,10 @@ namespace MicrowaveModule
             string respond = InterfacingPCWithGene2.programmingWorkTable(UserControlConnect.ComPort, CorrectCodes);
             MessageBox.Show(respond);
         }
+
+        private void buttonRequestReadingOneCoefficient_Click(object sender, RoutedEventArgs e)
+        {
+            InterfacingPCWithGene2.requestSingleCode(UserControlConnect.ComPort, adressCoef);
+        }
     }
 }

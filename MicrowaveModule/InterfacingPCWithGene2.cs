@@ -40,7 +40,6 @@ namespace MicrowaveModule.UserControl
             bytesToWrite[18] = 0;
             bytesToWrite[19] = 0;
 
-
             string name = "";
             string serialNumber = "";
             string versionFW = "";
@@ -56,6 +55,7 @@ namespace MicrowaveModule.UserControl
                 }
                 catch (Exception ex)
                 {
+
                     MessageBox.Show("(1)Ошибка записи данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
                     response[0] = "Ошибка записи данных в порт:";
                     response[1] = "Номер байта " + (i).ToString();
@@ -70,6 +70,7 @@ namespace MicrowaveModule.UserControl
                 }
                 catch (Exception ex)
                 {
+
                     MessageBox.Show("(2)Ошибка чтения данных с порта:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
                     response[0] = "Ошибка чтения данных с порта:";
                     response[1] = "Номер байта " + (i).ToString();
@@ -131,7 +132,7 @@ namespace MicrowaveModule.UserControl
                 catch (Exception ex)
                 {
                     MessageBox.Show("(3)Ошибка записи данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
-
+                    return;
                 }
                 try
                 {
@@ -141,13 +142,13 @@ namespace MicrowaveModule.UserControl
                 catch (Exception ex)
                 {
                     MessageBox.Show("(4)Ошибка чтения данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
-
+                    return;
                 }
 
                 if (bytesToRead[i] != bytesToWrite[i])
                 {
                     MessageBox.Show("(5)Ошибка передачи данных:\n Номер байта " + (i + 1).ToString() + "\n Переданный байт " + bytesToWrite[i].ToString() + "\n Принятый байт " + bytesToRead[i]);
-
+                    return;
                 }
             }
         }
