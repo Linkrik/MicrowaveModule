@@ -298,7 +298,7 @@ namespace MicrowaveModule.UserControl
             int N = 3;
             byte[] bytesToWrite = new byte[N];
             byte[] bytesToRead = new byte[N];
-            byte[] bytesToReadADC = {0,0};
+
             bytesToWrite[0] = 0x41; // "A" (код команды)
             bytesToWrite[1] = 0; // Старший байт АЦП
             bytesToWrite[2] = 0; // Младший байт АЦП
@@ -330,18 +330,11 @@ namespace MicrowaveModule.UserControl
                     if (bytesToRead[i] != bytesToWrite[i])
                     {
                         MessageBox.Show("(17)Ошибка передачи данных:\n Номер байта " + (i + 1).ToString() + "\n Переданный байт " + bytesToWrite[i].ToString() + "\n Принятый байт " + bytesToRead[i]);
-                        return bytesToReadADC;
+                        return bytesToRead;
                     }
                 }
-
-                if (i>0)
-                {
-
-                    bytesToReadADC[i-1] = bytesToWrite[i];
-                }
-
             }
-            return bytesToReadADC;
+            return bytesToRead;
         }
 
         /// <summary>

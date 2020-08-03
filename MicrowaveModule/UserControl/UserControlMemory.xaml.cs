@@ -35,9 +35,10 @@ namespace MicrowaveModule
 
         private void buttonRequestAdcCode_Click(object sender, RoutedEventArgs e)
         {
-            byte [] Adc = InterfacingPCWithGene2.requestAdcCode(UserControlConnect.ComPort);
-            textBlockAdcHigh.Text = Convert.ToString(Adc[0]); //старший байт
-            textBlockAdcLow.Text = Convert.ToString(Adc[1]);  //младший байт
+            byte[] Adc = new byte[3];
+            Adc=InterfacingPCWithGene2.requestAdcCode(UserControlConnect.ComPort);
+            textBlockAdcHigh.Text = Convert.ToString(Adc[1]); //старший байт
+            textBlockAdcLow.Text = Convert.ToString(Adc[2]);  //младший байт
         }
 
         /// <summary>

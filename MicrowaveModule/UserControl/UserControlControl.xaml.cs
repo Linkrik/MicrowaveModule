@@ -53,8 +53,9 @@ namespace MicrowaveModule
         /// <param name="e"></param>
         private void timer_Tick(object sender, EventArgs e)
         {
-            byte[] byteAdc= InterfacingPCWithGene2.requestAdcCode(UserControlConnect.ComPort);
-            int intAdc = byteAdc[0] * 256 + byteAdc[1];
+            byte[] byteAdc = new byte[3];
+            byteAdc=InterfacingPCWithGene2.requestAdcCode(UserControlConnect.ComPort);
+            int intAdc = byteAdc[1] * 256 + byteAdc[2];
             textBlockAdc.Text = Convert.ToString(intAdc);
         }
 
@@ -126,7 +127,7 @@ namespace MicrowaveModule
 
 
             //------------------------------------------------------//
-            if (true)//UserControlConnect.ComPort.IsOpen
+            if (UserControlConnect.ComPort.IsOpen)
             {
                 InterfacingPCWithGene2.sendControlAttDAC(UserControlConnect.ComPort, valueAtt);
             }
