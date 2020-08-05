@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Azure.Devices;
+using NuGet.Protocol.Plugins;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Ports;
@@ -9,6 +11,14 @@ namespace MicrowaveModule.UserControl
 {
     class InterfacingPCWithGene2
     {
+
+
+        private static bool flagParcelArrived = false;             //флаг прихода сообщения в буффер
+        private static bool flagMethodIsAlreadyRunning = false;    //флаг говорящий о том, запущена команда(метод) или нет (ПОКА НЕ ИСПОЛЬЗУЮ)
+
+        static public void myPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        { flagParcelArrived = true; } //метод при срабатывании события получения посылки в буфер.
+
         /// <summary>
         /// I. device identification
         /// </summary>
@@ -16,6 +26,8 @@ namespace MicrowaveModule.UserControl
         /// <returns></returns>
         public static string[] testConnection(SerialPort ComPort)
         {
+            flagMethodIsAlreadyRunning = true;
+
             byte[] bytesToWrite = new byte[20];
             byte[] bytesToRead = new byte[20];
 
@@ -61,7 +73,7 @@ namespace MicrowaveModule.UserControl
                     response[1] = "Номер байта " + (i).ToString();
                     response[2] = ex.Message;
                     response[3] = "";
-
+                    flagMethodIsAlreadyRunning = false;
                     return response;
                 }
                 try
@@ -76,7 +88,7 @@ namespace MicrowaveModule.UserControl
                     response[1] = "Номер байта " + (i).ToString();
                     response[2] = ex.Message;
                     response[3] = "";
-
+                    flagMethodIsAlreadyRunning = false;
                     return response;
                 }
 
@@ -105,6 +117,7 @@ namespace MicrowaveModule.UserControl
                 response[3] = serialNumber;
                 response[4] = versionFW;
             }
+            flagMethodIsAlreadyRunning = false;
             return response;
         }
 
@@ -115,6 +128,7 @@ namespace MicrowaveModule.UserControl
         /// <param name="commands">команда управления аттенюатором [0;63]</param>
         public static void sendControlAttDAC(SerialPort ComPort, byte commands)
         {
+            flagMethodIsAlreadyRunning = true;
             int N = 2;
             byte[] bytesToWrite = new byte[N];
             byte[] bytesToRead = new byte[N];
@@ -132,6 +146,7 @@ namespace MicrowaveModule.UserControl
                 catch (Exception ex)
                 {
                     MessageBox.Show("(3)Ошибка записи данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
+                    flagMethodIsAlreadyRunning = false;
                     return;
                 }
                 try
@@ -142,15 +157,18 @@ namespace MicrowaveModule.UserControl
                 catch (Exception ex)
                 {
                     MessageBox.Show("(4)Ошибка чтения данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
+                    flagMethodIsAlreadyRunning = false;
                     return;
                 }
 
                 if (bytesToRead[i] != bytesToWrite[i])
                 {
                     MessageBox.Show("(5)Ошибка передачи данных:\n Номер байта " + (i + 1).ToString() + "\n Переданный байт " + bytesToWrite[i].ToString() + "\n Принятый байт " + bytesToRead[i]);
+                    flagMethodIsAlreadyRunning = false;
                     return;
                 }
             }
+            flagMethodIsAlreadyRunning = false;
         }
 
         /// <summary>
@@ -160,6 +178,7 @@ namespace MicrowaveModule.UserControl
         /// <param name="command"> attenuator control command </param>
         public static void sendControlGateVoltage(SerialPort ComPort, int command)
         {
+            flagMethodIsAlreadyRunning = true;
             int N = 3;
             byte[] bytesToWrite = new byte[N];
             byte[] bytesToRead = new byte[N];
@@ -178,7 +197,8 @@ namespace MicrowaveModule.UserControl
                 catch (Exception ex)
                 {
                     MessageBox.Show("(6)Ошибка записи данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
-
+                    flagMethodIsAlreadyRunning = false;
+                    return;
                 }
                 try
                 {
@@ -188,7 +208,8 @@ namespace MicrowaveModule.UserControl
                 catch (Exception ex)
                 {
                     MessageBox.Show("(7)Ошибка чтения данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
-
+                    flagMethodIsAlreadyRunning = false;
+                    return;
                 }
 
                 if (bytesToRead[i] != bytesToWrite[i])
@@ -197,6 +218,7 @@ namespace MicrowaveModule.UserControl
 
                 }
             }
+            flagMethodIsAlreadyRunning = false;
         }
 
         /// <summary>
@@ -206,6 +228,7 @@ namespace MicrowaveModule.UserControl
         /// <param name="commands">comands control pover [0;3]]</param>
         public static void sendControlPower(SerialPort ComPort, byte commands)
         {
+            flagMethodIsAlreadyRunning = true;
             int N = 2;
             byte[] bytesToWrite = new byte[N];
             byte[] bytesToRead = new byte[N];
@@ -214,6 +237,7 @@ namespace MicrowaveModule.UserControl
 
             for (int i = 0; i < N; i++)
             {
+
                 try
                 {
                     ComPort.Write(bytesToWrite, i, 1);
@@ -221,17 +245,19 @@ namespace MicrowaveModule.UserControl
                 catch (Exception ex)
                 {
                     MessageBox.Show("(9)Ошибка записи данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
-
+                    flagMethodIsAlreadyRunning = false;
+                    return;
                 }
+
                 try
                 {
                     ComPort.Read(bytesToRead, i, 1);
-
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("(10)Ошибка чтения данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
-
+                    flagMethodIsAlreadyRunning = false;
+                    return;
                 }
 
                 if (bytesToRead[i] != bytesToWrite[i])
@@ -239,6 +265,7 @@ namespace MicrowaveModule.UserControl
                     MessageBox.Show("(11)Ошибка передачи данных:\n Номер байта " + (i + 1).ToString() + "\n Переданный байт " + bytesToWrite[i].ToString() + "\n Принятый байт " + bytesToRead[i]);
                 }
             }
+            flagMethodIsAlreadyRunning = false;
         }
 
         /// <summary>
@@ -248,6 +275,7 @@ namespace MicrowaveModule.UserControl
         /// <returns></returns>
         public static byte requestTemperCode(SerialPort ComPort)
         {
+            flagMethodIsAlreadyRunning = true;
             int N = 2;
             byte[] bytesToWrite = new byte[N];
             byte[] bytesToRead = new byte[N];
@@ -263,8 +291,10 @@ namespace MicrowaveModule.UserControl
                 catch (Exception ex)
                 {
                     MessageBox.Show("(12)Ошибка записи данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
-
+                    flagMethodIsAlreadyRunning = false;
+                    return 0;
                 }
+
                 try
                 {
                     ComPort.Read(bytesToRead, i, 1);
@@ -273,7 +303,8 @@ namespace MicrowaveModule.UserControl
                 catch (Exception ex)
                 {
                     MessageBox.Show("(13)Ошибка чтения данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
-
+                    flagMethodIsAlreadyRunning = false;
+                    return 0;
                 }
 
                 if (i < N - 1)
@@ -281,10 +312,12 @@ namespace MicrowaveModule.UserControl
                     if (bytesToRead[i] != bytesToWrite[i])
                     {
                         MessageBox.Show("(14)Ошибка передачи данных:\n Номер байта " + (i + 1).ToString() + "\n Переданный байт " + bytesToWrite[i].ToString() + "\n Принятый байт " + bytesToRead[i]);
+                        flagMethodIsAlreadyRunning = false;
                         return 0;
                     }
                 }
             }
+            flagMethodIsAlreadyRunning = false;
             return bytesToRead[1];
         }
 
@@ -295,6 +328,7 @@ namespace MicrowaveModule.UserControl
         /// <returns></returns>
         public static byte [] requestAdcCode(SerialPort ComPort)
         {
+            flagMethodIsAlreadyRunning = true;
             int N = 3;
             byte[] bytesToWrite = new byte[N];
             byte[] bytesToRead = new byte[N];
@@ -312,17 +346,19 @@ namespace MicrowaveModule.UserControl
                 catch (Exception ex)
                 {
                     MessageBox.Show("(15)Ошибка записи данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
-
+                    flagMethodIsAlreadyRunning = false;
+                    return bytesToRead;
                 }
+
                 try
                 {
                     ComPort.Read(bytesToRead, i, 1);
-
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("(16)Ошибка чтения данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
-
+                    flagMethodIsAlreadyRunning = false;
+                    return bytesToRead;
                 }
 
                 if (i < N - 1)
@@ -330,10 +366,12 @@ namespace MicrowaveModule.UserControl
                     if (bytesToRead[i] != bytesToWrite[i])
                     {
                         MessageBox.Show("(17)Ошибка передачи данных:\n Номер байта " + (i + 1).ToString() + "\n Переданный байт " + bytesToWrite[i].ToString() + "\n Принятый байт " + bytesToRead[i]);
+                        flagMethodIsAlreadyRunning = false;
                         return bytesToRead;
                     }
                 }
             }
+            flagMethodIsAlreadyRunning = false;
             return bytesToRead;
         }
 
@@ -345,6 +383,7 @@ namespace MicrowaveModule.UserControl
         /// <returns></returns>
         public static byte requestSingleCode(SerialPort ComPort, int address)
         {
+            flagMethodIsAlreadyRunning = true;
             int N = 4;
             byte[] bytesToWrite = new byte[N];
             byte[] bytesToRead = new byte[N];
@@ -362,16 +401,18 @@ namespace MicrowaveModule.UserControl
                 catch (Exception ex)
                 {
                     MessageBox.Show("(18)Ошибка записи данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
+                    flagMethodIsAlreadyRunning = false;
                     return 0;
                 }
+
                 try
                 {
                     ComPort.Read(bytesToRead, i, 1);
-
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("(19)Ошибка чтения данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
+                    flagMethodIsAlreadyRunning = false;
                     return 0;
                 }
 
@@ -380,10 +421,12 @@ namespace MicrowaveModule.UserControl
                     if (bytesToRead[i] != bytesToWrite[i])
                     {
                         MessageBox.Show("(20)Ошибка передачи данных:\n Номер байта " + (i + 1).ToString() + "\n Переданный байт " + bytesToWrite[i].ToString() + "\n Принятый байт " + bytesToRead[i]);
+                        flagMethodIsAlreadyRunning = false;
                         return 0;
                     }
                 }
             }
+            flagMethodIsAlreadyRunning = false;
             return bytesToRead[3];
         }
 
@@ -394,6 +437,7 @@ namespace MicrowaveModule.UserControl
         /// <returns></returns>
         public static byte[] requestWorkTable(SerialPort ComPort)
         {
+            flagMethodIsAlreadyRunning = true;
             int N = 65537;
             byte[] bytesToWrite = new byte[N];
             byte[] bytesToRead = new byte[N];
@@ -412,20 +456,23 @@ namespace MicrowaveModule.UserControl
                 {
                     ComPort.Close();
                     MessageBox.Show("(21)Ошибка записи данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
+                    flagMethodIsAlreadyRunning = false;
                     return bytesToRead;
                 }
+
                 try
                 {
                     ComPort.Read(bytesToRead, i, 1);
-
                 }
                 catch (Exception ex)
                 {
                     ComPort.Close();
                     MessageBox.Show("(22)Ошибка чтения данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
+                    flagMethodIsAlreadyRunning = false;
                     return bytesToRead;
                 }
             }
+            flagMethodIsAlreadyRunning = false;
             return bytesToRead;
         }
 
@@ -438,6 +485,7 @@ namespace MicrowaveModule.UserControl
         /// <returns></returns>
         public static void recordOfOneCoefficient(SerialPort ComPort,int address, byte CorrectCodes)
         {
+            flagMethodIsAlreadyRunning = true;
             int N = 5;
             byte[] bytesToWrite = new byte[N];
             byte[] bytesToRead = new byte[N];
@@ -456,17 +504,20 @@ namespace MicrowaveModule.UserControl
                 catch (Exception ex)
                 {
                     MessageBox.Show("(23)Ошибка записи данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
-
+                    flagMethodIsAlreadyRunning = false;
+                    return;
                 }
+
+
                 try
                 {
                     ComPort.Read(bytesToRead, i, 1);
-
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("(24)Ошибка чтения данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
-
+                    flagMethodIsAlreadyRunning = false;
+                    return;
                 }
 
                 if (i < N - 1)
@@ -474,10 +525,10 @@ namespace MicrowaveModule.UserControl
                     if (bytesToRead[i] != bytesToWrite[i])
                     {
                         MessageBox.Show("(25)Ошибка передачи данных:\n Номер байта " + (i + 1).ToString() + "\n Переданный байт " + bytesToWrite[i].ToString() + "\n Принятый байт " + bytesToRead[i]);
-
                     }
                 }
             }
+            flagMethodIsAlreadyRunning = false;
         }
 
         /// <summary>
@@ -488,6 +539,7 @@ namespace MicrowaveModule.UserControl
         /// <returns></returns>
         public static string programmingWorkTable(SerialPort ComPort, byte[] CorrectCodes)
         {
+            flagMethodIsAlreadyRunning = true;
             int N = 65538;
             byte[] bytesToWrite = new byte[N];
             byte[] bytesToRead = new byte[N];
@@ -508,8 +560,11 @@ namespace MicrowaveModule.UserControl
                 catch (Exception ex)
                 {
                     MessageBox.Show("(26)Ошибка записи данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
+                    flagMethodIsAlreadyRunning = false;
                     return "Ошибка";
                 }
+
+
                 try
                 {
                     ComPort.Read(bytesToRead, i, 1);
@@ -518,6 +573,7 @@ namespace MicrowaveModule.UserControl
                 catch (Exception ex)
                 {
                     MessageBox.Show("(27)Ошибка чтения данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
+                    flagMethodIsAlreadyRunning = false;
                     return "Ошибка";
                 }
 
@@ -527,6 +583,7 @@ namespace MicrowaveModule.UserControl
                     return "Ошибка";
                 }
             }
+            flagMethodIsAlreadyRunning = false;
             return "Данные переданы успешно.";
         }
     }

@@ -41,6 +41,8 @@ namespace MicrowaveModule
             textBlockAdcLow.Text = Convert.ToString(Adc[2]);  //младший байт
         }
 
+
+
         /// <summary>
         /// метод для выставления коректного адреса чтения/записи
         /// </summary>

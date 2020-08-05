@@ -24,6 +24,9 @@ namespace MicrowaveModule
     {
          
         public static SerialPort ComPort;
+
+
+
         public UserControlConnect()
         {
 
@@ -56,9 +59,8 @@ namespace MicrowaveModule
             comboBoxParity.Text = "Нет";
             #endregion
 
-
+            ComPort.DataReceived += new SerialDataReceivedEventHandler(InterfacingPCWithGene2.myPort_DataReceived);// Создал событие DataReceived (Указывает, что данные были получены через порт, представленный объектом SerialPort.) оповещение того, что в порт пришла посылка
         }
-
 
 
         private void buttonPortSurvey_Click(object sender, RoutedEventArgs e)

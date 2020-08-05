@@ -1,7 +1,9 @@
 ﻿using MicrowaveModule.UserControl;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
+using System.Threading;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
@@ -29,6 +31,8 @@ namespace MicrowaveModule
             timer.Tick += new EventHandler(timer_Tick);     //добавляем событие таймера при запуске
             timer.Interval = new TimeSpan(0, 0, 0, 0, 200); //событие будет срабатывать через каждые 200 мили сек. 
 
+            sensorDataBackgroundWorker.DoWork += Adc_DoWork;
+
             int[] DacStep = { 1, 16, 32, 64, 128, 256};
             comboBoxDacStep.Items.Clear();
             foreach (var item in DacStep)
@@ -38,6 +42,9 @@ namespace MicrowaveModule
             comboBoxDacStep.Text = "16";
             textBoxCodeDac12Bit.Text = "4095";
         }
+
+        BackgroundWorker sensorDataBackgroundWorker = new BackgroundWorker();//создаём поток для таймера.
+
         DispatcherTimer timer = new DispatcherTimer(); //создаем таймер
 
         private int codeDac = 0;   //значение затворного напряжения cod DAC
@@ -45,6 +52,37 @@ namespace MicrowaveModule
         private byte valueAtt = 0;  //значение аттенюатора
         private byte valuePow = 0;  //значение питания
         private bool flagEvent = true;
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void Adc_DoWork(object sender, DoWorkEventArgs e)
+        {
+            if (UserControlConnect.ComPort.IsOpen)                                              //если com-port открыт
+            {
+                byte[] returnADC = new byte[3];
+
+                byte[] byteAdc = new byte[3];
+                byteAdc = InterfacingPCWithGene2.requestAdcCode(UserControlConnect.ComPort);
+                textBlockAdc.Text = Convert.ToString(byteAdc[1] * 256 + byteAdc[2]);
+
+
+
+                byteAdc = InterfacingPCWithGene2.requestAdcCode(UserControlConnect.ComPort);    //запрос кода с ADC. Почему в одном потоке с самой формой? 
+
+                this.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
+                (ThreadStart)delegate ()
+                {
+                    textBlockAdc.Text = Convert.ToString(byteAdc[1] * 256 + byteAdc[2]);        //берем данные с АЦП и выдаем в textBlock
+                });
+
+            }
+        }
+
+
 
         /// <summary>
         /// событие при запуске таймера
