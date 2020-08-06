@@ -44,7 +44,6 @@ namespace MicrowaveModule
         }
 
         BackgroundWorker sensorDataBackgroundWorker = new BackgroundWorker();//создаём поток для таймера.
-
         DispatcherTimer timer = new DispatcherTimer(); //создаем таймер
 
         private int codeDac = 0;   //значение затворного напряжения cod DAC
@@ -55,7 +54,7 @@ namespace MicrowaveModule
 
 
         /// <summary>
-        /// 
+        /// Метод в другом потоке для непрерывного получения информации с АЦП
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -63,22 +62,13 @@ namespace MicrowaveModule
         {
             if (UserControlConnect.ComPort.IsOpen)                                              //если com-port открыт
             {
-                byte[] returnADC = new byte[3];
-
                 byte[] byteAdc = new byte[3];
-                byteAdc = InterfacingPCWithGene2.requestAdcCode(UserControlConnect.ComPort);
-                textBlockAdc.Text = Convert.ToString(byteAdc[1] * 256 + byteAdc[2]);
-
-
-
                 byteAdc = InterfacingPCWithGene2.requestAdcCode(UserControlConnect.ComPort);    //запрос кода с ADC. Почему в одном потоке с самой формой? 
-
                 this.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
                 (ThreadStart)delegate ()
                 {
                     textBlockAdc.Text = Convert.ToString(byteAdc[1] * 256 + byteAdc[2]);        //берем данные с АЦП и выдаем в textBlock
                 });
-
             }
         }
 
@@ -91,47 +81,90 @@ namespace MicrowaveModule
         /// <param name="e"></param>
         private void timer_Tick(object sender, EventArgs e)
         {
-            byte[] byteAdc = new byte[3];
-            byteAdc=InterfacingPCWithGene2.requestAdcCode(UserControlConnect.ComPort);
-            int intAdc = byteAdc[1] * 256 + byteAdc[2];
-            textBlockAdc.Text = Convert.ToString(intAdc);
+            if (!sensorDataBackgroundWorker.IsBusy)
+            {
+                sensorDataBackgroundWorker.RunWorkerAsync();
+            }
+            if (!UserControlConnect.ComPort.IsOpen)
+            {
+                buttonStopAdc.IsEnabled = false;
+                buttonStartAdc.IsEnabled = true;
+            }
         }
 
         /// <summary>
         /// управление затворным напряжением
         /// </summary>
-        private void NumericUpDownCodeDac_Value()
+        private void NumericUpDownCodeDac_ValueGateVoltage()
         {
             int number;
+            textBoxCodeDac12Bit.TextChanged -= new System.Windows.Controls.TextChangedEventHandler(this.textBoxCodeDac12Bit_TextChanged);  // отключаем событие изменения textbox
             if (int.TryParse(textBoxCodeDac12Bit.Text, out number))
             {
                 if (number >=0 && number <= 4095)
                 {
-                    textBoxCodeDac12Bit.Text = Convert.ToString(number);
-                    codeDac = Convert.ToInt32(number);
+                    codeDac = number;
+                    textBoxCodeDac12Bit.Text = Convert.ToString(codeDac);  // поставил, чтобы первый символ не мог быть 0
                 }
                 else if (number < 0)
                 {
                     number = 0;
                     textBoxCodeDac12Bit.Text = Convert.ToString(number);
-                    codeDac = Convert.ToInt32(number);
+                    codeDac = number;
                 }
                 else
                 {
                     number = 4095;
                     textBoxCodeDac12Bit.Text = Convert.ToString(number);
-                    codeDac = Convert.ToInt32(number);
+                    codeDac = number;
                 }
             }
             else
             {
                 textBoxCodeDac12Bit.Text = Convert.ToString(codeDac);
             }
-
+            textBoxCodeDac12Bit.TextChanged += new System.Windows.Controls.TextChangedEventHandler(this.textBoxCodeDac12Bit_TextChanged);  //включаем событие изменения textbox
             if (UserControlConnect.ComPort.IsOpen)
             {
+                timer.Stop();
+                while (sensorDataBackgroundWorker.IsBusy)
+                { }
                 InterfacingPCWithGene2.sendControlGateVoltage(UserControlConnect.ComPort, codeDac);
+                timer.Start();
             }
+        }
+
+
+        /// <summary>
+        /// управление аттенбатором из текст бокса
+        /// </summary>
+        private void NumericUpDownCodeDac_ValueAttenuator()
+        {
+            int number;
+            textBoxAttenuatorUpDown.TextChanged -= new System.Windows.Controls.TextChangedEventHandler(this.textBoxAttenuatorUpDown_TextChanged);  // отключаем событие изменения textbox
+            if (Int32.TryParse(textBoxAttenuatorUpDown.Text, out number))
+            {
+                if (number >= 0 && number <= 63)
+                {
+                    DistributionOfCheckboxes(number);
+                    GenerationNumericUpDownAtt1_Value();
+                }
+                else if (number < 0)
+                {
+                    DistributionOfCheckboxes(0);
+                    GenerationNumericUpDownAtt1_Value();
+                }
+                else
+                {
+                    DistributionOfCheckboxes(63);
+                    GenerationNumericUpDownAtt1_Value();
+                }
+            }
+            else
+            {
+                textBoxAttenuatorUpDown.Text = Convert.ToString(valueAtt);
+            }
+            textBoxAttenuatorUpDown.TextChanged += new System.Windows.Controls.TextChangedEventHandler(this.textBoxAttenuatorUpDown_TextChanged);  // включаем событие изменения textbox
         }
 
         /// <summary>
@@ -144,7 +177,11 @@ namespace MicrowaveModule
             
             if (UserControlConnect.ComPort.IsOpen)
             {
+                timer.Stop();
+                while (sensorDataBackgroundWorker.IsBusy)
+                { }
                 InterfacingPCWithGene2.sendControlPower(UserControlConnect.ComPort, valuePow);
+                timer.Start();
             }
 
         }
@@ -155,7 +192,7 @@ namespace MicrowaveModule
         private void GenerationNumericUpDownAtt1_Value()
         {
 
-            valueAtt = Convert.ToByte(Convert.ToInt32(checkBoxAtt1bit0.IsChecked) |                 //if (checkBoxAtt1bit0.IsChecked == true) newValue += 1;
+            valueAtt = Convert.ToByte(Convert.ToInt32(checkBoxAtt1bit0.IsChecked) |       //if (checkBoxAtt1bit0.IsChecked == true) newValue += 1;
                 Convert.ToInt32(checkBoxAtt1bit1.IsChecked) << 1 |                        //if (checkBoxAtt1bit1.IsChecked == true) newValue += 2;
                 Convert.ToInt32(checkBoxAtt1bit2.IsChecked) << 2 |                        //if (checkBoxAtt1bit2.IsChecked == true) newValue += 4;
                 Convert.ToInt32(checkBoxAtt1bit3.IsChecked) << 3 |                        //if (checkBoxAtt1bit3.IsChecked == true) newValue += 8;
@@ -167,7 +204,11 @@ namespace MicrowaveModule
             //------------------------------------------------------//
             if (UserControlConnect.ComPort.IsOpen)
             {
+                timer.Stop();
+                while (sensorDataBackgroundWorker.IsBusy)
+                { }
                 InterfacingPCWithGene2.sendControlAttDAC(UserControlConnect.ComPort, valueAtt);
+                timer.Start();
             }
         }
 
@@ -313,29 +354,7 @@ namespace MicrowaveModule
         {
             if (textBoxAttenuatorUpDown.Text!="")
             {
-                int number;
-                if (Int32.TryParse(textBoxAttenuatorUpDown.Text, out number))
-                {
-                    if (number >= 0 && number <= 63)
-                    {
-                        DistributionOfCheckboxes(number);
-                        GenerationNumericUpDownAtt1_Value();
-                    }
-                    else if (number < 0)
-                    {
-                        DistributionOfCheckboxes(0);
-                        GenerationNumericUpDownAtt1_Value();
-                    }
-                    else
-                    {
-                        DistributionOfCheckboxes(63);
-                        GenerationNumericUpDownAtt1_Value();
-                    }
-                }
-                else
-                {
-                    textBoxAttenuatorUpDown.Text = Convert.ToString(valueAtt);
-                }
+                NumericUpDownCodeDac_ValueAttenuator();
             }
         }
         #endregion
@@ -372,12 +391,6 @@ namespace MicrowaveModule
                 codeDac = 4095;
             }
             textBoxCodeDac12Bit.Text = Convert.ToString(codeDac);
-
-            if (UserControlConnect.ComPort.IsOpen)
-            {
-                InterfacingPCWithGene2.sendControlGateVoltage(UserControlConnect.ComPort, codeDac);
-            }
-
         }
 
         private void buttonDownTextBoxCodeDac_Click(object sender, RoutedEventArgs e)
@@ -388,18 +401,13 @@ namespace MicrowaveModule
                 codeDac = 0;
             }
             textBoxCodeDac12Bit.Text = Convert.ToString(codeDac);
-
-            if (UserControlConnect.ComPort.IsOpen)
-            {
-                InterfacingPCWithGene2.sendControlGateVoltage(UserControlConnect.ComPort, codeDac);
-            }
         }
 
         private void textBoxCodeDac12Bit_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (textBoxCodeDac12Bit.Text != "")
             {
-                    NumericUpDownCodeDac_Value();
+                    NumericUpDownCodeDac_ValueGateVoltage();
             }
         }
 
