@@ -43,14 +43,15 @@ namespace MicrowaveModule
             textBoxCodeDac12Bit.Text = "4095";
         }
 
-        BackgroundWorker sensorDataBackgroundWorker = new BackgroundWorker();//создаём поток для таймера.
-        DispatcherTimer timer = new DispatcherTimer(); //создаем таймер
+        public static BackgroundWorker sensorDataBackgroundWorker = new BackgroundWorker();//создаём поток для таймера.
+        public static DispatcherTimer timer = new DispatcherTimer(); //создаем таймер
 
         private int codeDac = 0;   //значение затворного напряжения cod DAC
         private int dacStep = 0;   //значение затворного напряжения DAC Step
         private byte valueAtt = 0;  //значение аттенюатора
         private byte valuePow = 0;  //значение питания
         private bool flagEvent = true;
+        private bool flagButtonStart = false; //флаг-была ли нажата кнопка старт
 
 
         /// <summary>
@@ -81,14 +82,18 @@ namespace MicrowaveModule
         /// <param name="e"></param>
         private void timer_Tick(object sender, EventArgs e)
         {
-            if (!sensorDataBackgroundWorker.IsBusy)
-            {
-                sensorDataBackgroundWorker.RunWorkerAsync();
-            }
             if (!UserControlConnect.ComPort.IsOpen)
             {
+                timer.Stop();
                 buttonStopAdc.IsEnabled = false;
                 buttonStartAdc.IsEnabled = true;
+            }
+            else
+            {
+                if (!sensorDataBackgroundWorker.IsBusy && flagButtonStart)
+                {
+                    sensorDataBackgroundWorker.RunWorkerAsync();
+                }
             }
         }
 
@@ -421,9 +426,11 @@ namespace MicrowaveModule
         {
             if (UserControlConnect.ComPort.IsOpen)
             {
+                flagButtonStart = true;
                 timer.Start();
                 buttonStopAdc.IsEnabled = true;
                 buttonStartAdc.IsEnabled = false;
+                
             }
             else
             {
@@ -434,6 +441,7 @@ namespace MicrowaveModule
         private void buttonStopAdc_Click(object sender, RoutedEventArgs e)
         {
             timer.Stop();
+            flagButtonStart = false;
             buttonStopAdc.IsEnabled = false;
             buttonStartAdc.IsEnabled = true;
         }
