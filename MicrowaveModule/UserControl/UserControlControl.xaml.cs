@@ -41,6 +41,13 @@ namespace MicrowaveModule
             }
             comboBoxDacStep.Text = "16";
             textBoxCodeDac12Bit.Text = "4095";
+
+            checkBoxAtt1bit0.IsChecked = (true);
+            checkBoxAtt1bit1.IsChecked = (true);                       
+            checkBoxAtt1bit2.IsChecked = (true);                
+            checkBoxAtt1bit3.IsChecked = (true);                
+            checkBoxAtt1bit4.IsChecked = (true);                
+            checkBoxAtt1bit5.IsChecked = (true);
         }
 
         public static BackgroundWorker sensorDataBackgroundWorker = new BackgroundWorker();//создаём поток для таймера.
@@ -64,7 +71,7 @@ namespace MicrowaveModule
             if (UserControlConnect.ComPort.IsOpen)                                              //если com-port открыт
             {
                 byte[] byteAdc = new byte[3];
-                byteAdc = InterfacingPCWithGene2.requestAdcCode(UserControlConnect.ComPort);    //запрос кода с ADC. Почему в одном потоке с самой формой? 
+                byteAdc = InterfacingPCWithGene2.requestAdcCode(UserControlConnect.ComPort);    //запрос кода с ADC. 
                 this.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
                 (ThreadStart)delegate ()
                 {
@@ -94,6 +101,10 @@ namespace MicrowaveModule
                 {
                     sensorDataBackgroundWorker.RunWorkerAsync();
                 }
+                else if (!flagButtonStart) 
+                {
+                    timer.Stop();
+                }
             }
         }
 
@@ -104,6 +115,7 @@ namespace MicrowaveModule
         {
             int number;
             textBoxCodeDac12Bit.TextChanged -= new System.Windows.Controls.TextChangedEventHandler(this.textBoxCodeDac12Bit_TextChanged);  // отключаем событие изменения textbox
+            
             if (int.TryParse(textBoxCodeDac12Bit.Text, out number))
             {
                 if (number >=0 && number <= 4095)
@@ -128,8 +140,10 @@ namespace MicrowaveModule
             {
                 textBoxCodeDac12Bit.Text = Convert.ToString(codeDac);
             }
+
             textBoxCodeDac12Bit.TextChanged += new System.Windows.Controls.TextChangedEventHandler(this.textBoxCodeDac12Bit_TextChanged);  //включаем событие изменения textbox
-            if (UserControlConnect.ComPort.IsOpen)
+            
+            if (UserControlConnect.ComPort.IsOpen&&flagButtonStart)
             {
                 timer.Stop();
                 while (sensorDataBackgroundWorker.IsBusy)

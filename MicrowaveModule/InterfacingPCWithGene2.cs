@@ -361,15 +361,15 @@ namespace MicrowaveModule.UserControl
                     return bytesToRead;
                 }
 
-                if (i < N - 1)
-                {
-                    if (bytesToRead[i] != bytesToWrite[i])
-                    {
-                        MessageBox.Show("(17)Ошибка передачи данных:\n Номер байта " + (i + 1).ToString() + "\n Переданный байт " + bytesToWrite[i].ToString() + "\n Принятый байт " + bytesToRead[i]);
-                        flagMethodIsAlreadyRunning = false;
-                        return bytesToRead;
-                    }
-                }
+                //if (i < N - 1)
+                //{
+                //    if (bytesToRead[i] != bytesToWrite[i])
+                //    {
+                //        MessageBox.Show("(17)Ошибка передачи данных:\n Номер байта " + (i + 1).ToString() + "\n Переданный байт " + bytesToWrite[i].ToString() + "\n Принятый байт " + bytesToRead[i]);
+                //        flagMethodIsAlreadyRunning = false;
+                //        return bytesToRead;
+                //    }
+                //}
             }
             flagMethodIsAlreadyRunning = false;
             return bytesToRead;
