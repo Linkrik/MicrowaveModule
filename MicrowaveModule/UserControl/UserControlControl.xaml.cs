@@ -75,7 +75,7 @@ namespace MicrowaveModule
                 this.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
                 (ThreadStart)delegate ()
                 {
-                    textBlockAdc.Text = Convert.ToString(byteAdc[1] * 256 + byteAdc[2]);        //берем данные с АЦП и выдаем в textBlock
+                    textBlockAdc.Text = Convert.ToString(byteAdc[2] * 256 + byteAdc[1]);        //берем данные с АЦП и выдаем в textBlock
                 });
             }
         }
@@ -143,7 +143,7 @@ namespace MicrowaveModule
 
             textBoxCodeDac12Bit.TextChanged += new System.Windows.Controls.TextChangedEventHandler(this.textBoxCodeDac12Bit_TextChanged);  //включаем событие изменения textbox
             
-            if (UserControlConnect.ComPort.IsOpen&&flagButtonStart)
+            if (UserControlConnect.ComPort.IsOpen)
             {
                 timer.Stop();
                 while (sensorDataBackgroundWorker.IsBusy)

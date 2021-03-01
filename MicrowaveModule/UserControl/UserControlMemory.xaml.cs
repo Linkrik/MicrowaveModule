@@ -57,9 +57,11 @@ namespace MicrowaveModule
             { }
             
             byte[] Adc = new byte[3];
-            Adc=InterfacingPCWithGene2.requestAdcCode(UserControlConnect.ComPort);
-            textBlockAdcHigh.Text = Convert.ToString(Adc[1]); //старший байт
-            textBlockAdcLow.Text = Convert.ToString(Adc[2]);  //младший байт
+
+
+            Adc =InterfacingPCWithGene2.requestAdcCode(UserControlConnect.ComPort);
+            textBlockAdcHigh.Text = Convert.ToString(Adc[2]); //старший байт
+            textBlockAdcLow.Text = Convert.ToString(Adc[1]);  //младший байт
             
             UserControlControl.timer.Start();
         }

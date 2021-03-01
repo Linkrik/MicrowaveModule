@@ -28,29 +28,8 @@ namespace MicrowaveModule.UserControl
         {
             flagMethodIsAlreadyRunning = true;
 
-            byte[] bytesToWrite = new byte[20];
-            byte[] bytesToRead = new byte[20];
-
-            bytesToWrite[0] = 73;
-            bytesToWrite[1] = 0;
-            bytesToWrite[2] = 0;
-            bytesToWrite[3] = 0;
-            bytesToWrite[4] = 0;
-            bytesToWrite[5] = 0;
-            bytesToWrite[6] = 0;
-            bytesToWrite[7] = 0;
-            bytesToWrite[8] = 0;
-            bytesToWrite[9] = 0;
-            bytesToWrite[10] = 0;
-            bytesToWrite[11] = 0;
-            bytesToWrite[12] = 0;
-            bytesToWrite[13] = 0;
-            bytesToWrite[14] = 0;
-            bytesToWrite[15] = 0;
-            bytesToWrite[16] = 0;
-            bytesToWrite[17] = 0;
-            bytesToWrite[18] = 0;
-            bytesToWrite[19] = 0;
+            byte[] byteToWrite = { 0x49 };
+            byte[] bytesToRead = new byte[19];
 
             string name = "";
             string serialNumber = "";
@@ -59,23 +38,25 @@ namespace MicrowaveModule.UserControl
             string[] response = new string[5];
 
 
-            for (int i = 0; i < 20; i++)
+            try
             {
-                try
-                {
-                    ComPort.Write(bytesToWrite, i, 1);
-                }
-                catch (Exception ex)
-                {
+                ComPort.Write(byteToWrite,0,1);
+            }
+            catch (Exception ex)
+            {
 
-                    MessageBox.Show("(1)Ошибка записи данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
-                    response[0] = "Ошибка записи данных в порт:";
-                    response[1] = "Номер байта " + (i).ToString();
-                    response[2] = ex.Message;
-                    response[3] = "";
-                    flagMethodIsAlreadyRunning = false;
-                    return response;
-                }
+                MessageBox.Show("(1)Ошибка записи данных в порт:\n  байт byteToWrite" + "\n" + ex.Message);
+                response[0] = "Ошибка записи данных в порт:";
+                response[1] = "байт byteToWrite";
+                response[2] = ex.Message;
+                response[3] = "";
+                flagMethodIsAlreadyRunning = false;
+                return response;
+            }
+
+            for (int i = 0; i < 19; i++)
+            {
+                
                 try
                 {
                     ComPort.Read(bytesToRead, i, 1);
@@ -92,10 +73,6 @@ namespace MicrowaveModule.UserControl
                     return response;
                 }
 
-                if (i < 20 - 1)
-                {
-                    //bytesToWrite[i + 1] = bytesToRead[i];
-                }
                 if ((0 < i) & (i < 6))
                 {
                     //name += System.Text.Encoding.ASCII.GetString(bytesToRead, i, 1);
@@ -161,7 +138,7 @@ namespace MicrowaveModule.UserControl
                     return;
                 }
 
-                if (bytesToRead[i] != bytesToWrite[i])
+                if (bytesToRead[0] != bytesToWrite[0])
                 {
                     MessageBox.Show("(5)Ошибка передачи данных:\n Номер байта " + (i + 1).ToString() + "\n Переданный байт " + bytesToWrite[i].ToString() + "\n Принятый байт " + bytesToRead[i]);
                     flagMethodIsAlreadyRunning = false;
@@ -181,12 +158,12 @@ namespace MicrowaveModule.UserControl
             flagMethodIsAlreadyRunning = true;
             int N = 3;
             byte[] bytesToWrite = new byte[N];
-            byte[] bytesToRead = new byte[N];
-            bytesToWrite[0] = 0x47; // "C" (код команды) 
-            bytesToWrite[1] = (byte)(command/16);      // старший байт адреса 12-ти битного кода ЦАП (0, 1, 2… 255)
-            bytesToWrite[2] = (byte)((command%16)<<4); // младший байт адреса 12-ти битного кода ЦАП (0, 16, 32… 240)
-
-
+            byte[] bytesToRead = new byte[N-2];
+            byte[] bytesComand = BitConverter.GetBytes(command);
+            bytesToWrite[0] = 0x47; // "G" (код команды) 
+            bytesToWrite[1] = bytesComand[0];      // младший  байт адреса 12-ти битного кода ЦАП (0, 1, 2… 255)
+            bytesToWrite[2] = bytesComand[1];      // старший байт адреса 12-ти битного кода ЦАП (0, 16, 32… 240)
+            
 
             for (int i = 0; i < N; i++)
             {
@@ -200,24 +177,23 @@ namespace MicrowaveModule.UserControl
                     flagMethodIsAlreadyRunning = false;
                     return;
                 }
-                try
-                {
-                    ComPort.Read(bytesToRead, i, 1);
 
-                }
-                catch (Exception ex)
+                if (i==0)
                 {
-                    MessageBox.Show("(7)Ошибка чтения данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
-                    flagMethodIsAlreadyRunning = false;
-                    return;
-                }
+                    try
+                    {
+                        ComPort.Read(bytesToRead, 0, 1);
 
-                if (bytesToRead[i] != bytesToWrite[i])
-                {
-                    MessageBox.Show("(8)Ошибка передачи данных:\n Номер байта " + (i + 1).ToString() + "\n Переданный байт " + bytesToWrite[i].ToString() + "\n Принятый байт " + bytesToRead[i]);
-
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("(7)Ошибка чтения данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
+                        flagMethodIsAlreadyRunning = false;
+                        return;
+                    }
                 }
             }
+
             flagMethodIsAlreadyRunning = false;
         }
 
@@ -249,18 +225,21 @@ namespace MicrowaveModule.UserControl
                     return;
                 }
 
-                try
+                if (i == 0)
                 {
-                    ComPort.Read(bytesToRead, i, 1);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("(10)Ошибка чтения данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
-                    flagMethodIsAlreadyRunning = false;
-                    return;
+                    try
+                    {
+                        ComPort.Read(bytesToRead, 0, 1);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("(10)Ошибка чтения данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
+                        flagMethodIsAlreadyRunning = false;
+                        return;
+                    }
                 }
 
-                if (bytesToRead[i] != bytesToWrite[i])
+                if (bytesToRead[0] != bytesToWrite[0])
                 {
                     MessageBox.Show("(11)Ошибка передачи данных:\n Номер байта " + (i + 1).ToString() + "\n Переданный байт " + bytesToWrite[i].ToString() + "\n Принятый байт " + bytesToRead[i]);
                 }
@@ -273,52 +252,79 @@ namespace MicrowaveModule.UserControl
         /// </summary>
         /// <param name="ComPort">device</param>
         /// <returns></returns>
-        public static byte requestTemperCode(SerialPort ComPort)
+        public static double requestTemperCode(SerialPort ComPort)
         {
             flagMethodIsAlreadyRunning = true;
-            int N = 2;
-            byte[] bytesToWrite = new byte[N];
+            int N = 3;
+            double constTempCoeff = 0.00390625;
+            byte[] bytesToWrite = new byte[N-2];
             byte[] bytesToRead = new byte[N];
+            uint temperatureByte = 0;
             bytesToWrite[0] = 0x4B; // "K" (код команды)
-            bytesToWrite[1] = 75; // 
+            //bytesToWrite[1] = 75; // 
 
-            for (int i = 0; i < N; i++)
+
+            try
             {
-                try
-                {
-                    ComPort.Write(bytesToWrite, i, 1);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("(12)Ошибка записи данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
-                    flagMethodIsAlreadyRunning = false;
-                    return 0;
-                }
-
-                try
-                {
-                    ComPort.Read(bytesToRead, i, 1);
-
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("(13)Ошибка чтения данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
-                    flagMethodIsAlreadyRunning = false;
-                    return 0;
-                }
-
-                if (i < N - 1)
-                {
-                    if (bytesToRead[i] != bytesToWrite[i])
-                    {
-                        MessageBox.Show("(14)Ошибка передачи данных:\n Номер байта " + (i + 1).ToString() + "\n Переданный байт " + bytesToWrite[i].ToString() + "\n Принятый байт " + bytesToRead[i]);
-                        flagMethodIsAlreadyRunning = false;
-                        return 0;
-                    }
-                }
+                ComPort.Write(bytesToWrite, 0, 1);
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show("(12)Ошибка записи данных в порт:\n Номер байта "  + "\n" + ex.Message);
+                flagMethodIsAlreadyRunning = false;
+                return 0;
+            }
+
+            try
+            {
+                ComPort.Read(bytesToRead, 0, 1);
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("(13)Ошибка чтения данных в порт:\n Номер байта "  + "\n" + ex.Message);
+                flagMethodIsAlreadyRunning = false;
+                return 0;
+            }
+
+            try
+            {
+                ComPort.Read(bytesToRead, 1, 1);
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("(13)Ошибка чтения данных в порт:\n Номер байта " +  "\n" + ex.Message);
+                flagMethodIsAlreadyRunning = false;
+                return 0;
+            }
+
+            try
+            {
+                ComPort.Read(bytesToRead, 2, 1);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("(13)Ошибка чтения данных в порт:\n Номер байта " + "\n" + ex.Message);
+                flagMethodIsAlreadyRunning = false;
+                return 0;
+            }
+
+            temperatureByte = bytesToRead[1];
+            temperatureByte += Convert.ToUInt32(bytesToRead[2] << 8);
+
+            int val = Convert.ToInt32(BitOperator.ExtractNumber(temperatureByte, 0, 15));
+            uint sign = BitOperator.ExtractNumber(temperatureByte, 15, 1);
+
+
+            if (sign == 1)
+            {
+                val *= -1;
+            }
+ 
+
             flagMethodIsAlreadyRunning = false;
-            return bytesToRead[1];
+            return val * constTempCoeff;
         }
 
         /// <summary>
@@ -337,40 +343,53 @@ namespace MicrowaveModule.UserControl
             bytesToWrite[1] = 0; // Старший байт АЦП
             bytesToWrite[2] = 0; // Младший байт АЦП
 
-            for (int i = 0; i < N; i++)
+            try
             {
-                try
-                {
-                    ComPort.Write(bytesToWrite, i, 1);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("(15)Ошибка записи данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
-                    flagMethodIsAlreadyRunning = false;
-                    return bytesToRead;
-                }
-
-                try
-                {
-                    ComPort.Read(bytesToRead, i, 1);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("(16)Ошибка чтения данных в порт:\n Номер байта " + (i).ToString() + "\n" + ex.Message);
-                    flagMethodIsAlreadyRunning = false;
-                    return bytesToRead;
-                }
-
-                //if (i < N - 1)
-                //{
-                //    if (bytesToRead[i] != bytesToWrite[i])
-                //    {
-                //        MessageBox.Show("(17)Ошибка передачи данных:\n Номер байта " + (i + 1).ToString() + "\n Переданный байт " + bytesToWrite[i].ToString() + "\n Принятый байт " + bytesToRead[i]);
-                //        flagMethodIsAlreadyRunning = false;
-                //        return bytesToRead;
-                //    }
-                //}
+                ComPort.Write(bytesToWrite, 0, 1);
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show("(15)Ошибка записи данных в порт:\n Номер байта " + "\n" + ex.Message);
+                flagMethodIsAlreadyRunning = false;
+                return bytesToRead;
+            }
+
+            try
+            {
+                ComPort.Read(bytesToRead, 0, 1);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("(16)Ошибка чтения данных в порт:\n Номер байта " + "\n" + ex.Message);
+                flagMethodIsAlreadyRunning = false;
+                return bytesToRead;
+            }
+
+
+            try
+            {
+                ComPort.Read(bytesToRead, 1, 1);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("(16)Ошибка чтения данных в порт:\n Номер байта " + "\n" + ex.Message);
+                flagMethodIsAlreadyRunning = false;
+                return bytesToRead;
+            }
+
+
+            try
+            {
+                ComPort.Read(bytesToRead, 2, 1);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("(16)Ошибка чтения данных в порт:\n Номер байта " + "\n" + ex.Message);
+                flagMethodIsAlreadyRunning = false;
+                return bytesToRead;
+            }
+
+           
             flagMethodIsAlreadyRunning = false;
             return bytesToRead;
         }
