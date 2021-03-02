@@ -29,9 +29,8 @@ namespace MicrowaveModule
             buttonStopAdc.IsEnabled = false;
 
             timer.Tick += new EventHandler(timer_Tick);     //добавляем событие таймера при запуске
-            timer.Interval = new TimeSpan(0, 0, 0, 0, 200); //событие будет срабатывать через каждые 200 мили сек. 
+            timer.Interval = new TimeSpan(0, 0, 0, 0, 500); //событие будет срабатывать через каждые 200 мили сек. 
 
-            sensorDataBackgroundWorker.DoWork += Adc_DoWork;
 
             int[] DacStep = { 1, 16, 32, 64, 128, 256};
             comboBoxDacStep.Items.Clear();
@@ -50,7 +49,6 @@ namespace MicrowaveModule
             checkBoxAtt1bit5.IsChecked = (true);
         }
 
-        public static BackgroundWorker sensorDataBackgroundWorker = new BackgroundWorker();//создаём поток для таймера.
         public static DispatcherTimer timer = new DispatcherTimer(); //создаем таймер
 
         private int codeDac = 0;   //значение затворного напряжения cod DAC
@@ -62,22 +60,17 @@ namespace MicrowaveModule
 
 
         /// <summary>
-        /// Метод в другом потоке для непрерывного получения информации с АЦП
+        /// Метод для получения информации с АЦП
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Adc_DoWork(object sender, DoWorkEventArgs e)
+        void Adc_DoWork()
         {
-            if (UserControlConnect.ComPort.IsOpen)                                              //если com-port открыт
-            {
-                byte[] byteAdc = new byte[3];
-                byteAdc = InterfacingPCWithGene2.requestAdcCode(UserControlConnect.ComPort);    //запрос кода с ADC. 
-                this.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
-                (ThreadStart)delegate ()
-                {
-                    textBlockAdc.Text = Convert.ToString(byteAdc[2] * 256 + byteAdc[1]);        //берем данные с АЦП и выдаем в textBlock
-                });
-            }
+            
+            byte[] byteAdc = new byte[3];
+            byteAdc = InterfacingPCWithGene2.requestAdcCode(UserControlConnect.ComPort);    //запрос кода с ADC. 
+            textBlockAdc.Text = Convert.ToString(byteAdc[2] * 256 + byteAdc[1]);            //берем данные с АЦП и выдаем в textBlock
+            
         }
 
 
@@ -97,11 +90,11 @@ namespace MicrowaveModule
             }
             else
             {
-                if (!sensorDataBackgroundWorker.IsBusy && flagButtonStart)
+                if (flagButtonStart)
                 {
-                    sensorDataBackgroundWorker.RunWorkerAsync();
+                    Adc_DoWork();
                 }
-                else if (!flagButtonStart) 
+                else 
                 {
                     timer.Stop();
                 }
@@ -145,11 +138,7 @@ namespace MicrowaveModule
             
             if (UserControlConnect.ComPort.IsOpen)
             {
-                timer.Stop();
-                while (sensorDataBackgroundWorker.IsBusy)
-                { }
                 InterfacingPCWithGene2.sendControlGateVoltage(UserControlConnect.ComPort, codeDac);
-                timer.Start();
             }
         }
 
@@ -196,11 +185,7 @@ namespace MicrowaveModule
             
             if (UserControlConnect.ComPort.IsOpen)
             {
-                timer.Stop();
-                while (sensorDataBackgroundWorker.IsBusy)
-                { }
                 InterfacingPCWithGene2.sendControlPower(UserControlConnect.ComPort, valuePow);
-                timer.Start();
             }
 
         }
@@ -223,11 +208,7 @@ namespace MicrowaveModule
             //------------------------------------------------------//
             if (UserControlConnect.ComPort.IsOpen)
             {
-                timer.Stop();
-                while (sensorDataBackgroundWorker.IsBusy)
-                { }
                 InterfacingPCWithGene2.sendControlAttDAC(UserControlConnect.ComPort, valueAtt);
-                timer.Start();
             }
         }
 
